@@ -13,6 +13,7 @@ import java.util.List;
  * An implementation of the Translator interface which translates
  * the country code "can" to several languages.
  */
+
 public class InLabByHandTranslator implements Translator {
     /**
      * Returns the language abbreviations for all languages whose translations are
@@ -21,29 +22,30 @@ public class InLabByHandTranslator implements Translator {
      * @param country the country
      * @return list of language abbreviations which are available for this country
      */
+
+    public static final String CANADA = "can";
+
     @Override
     public List<String> getCountryLanguages(String country) {
         // TODO Checkstyle: The String "can" appears 4 times in the file.
-        if ("can".equals(country)) {
-            return new ArrayList<>(List.of("de", "en", "zh"));
+        if (CANADA.equals(country)) {
+            return new ArrayList<>(List.of("de", "en", "zh", "es"));
         }
         return new ArrayList<>();
     }
 
     // TODO Checkstyle: Static variable definition in wrong order.
-    public static final String CANADA = "can";
-
     /**
      * Returns the country abbreviations for all countries whose translations are
      * available from this Translator.
      *
      * @return list of country abbreviations for which we have translations available
      */
+
     @Override
     public List<String> getCountries() {
         return new ArrayList<>(List.of("can"));
     }
-
     /**
      * Returns the name of the country based on the specified country abbreviation and language abbreviation.
      *
@@ -51,24 +53,35 @@ public class InLabByHandTranslator implements Translator {
      * @param language the language
      * @return the name of the country in the given language or null if no translation is available
      */
+
     @Override
     public String translate(String country, String language) {
         // TODO Checkstyle: Return count is 5 (max allowed for non-void methods/ lambdas is 2).
         // TODO Checkstyle: String literal expressions should be on the left side of an equals comparison
-        if (!country.equals("can")) {
+        if (!CANADA.equals(country)) {
             return null;
         }
-        if (language.equals("de")) {
-            return "Kanada";
+
+        String translation;
+
+        switch (language) {
+            case "de":
+                translation = "Kanada";
+                break;
+            case "en":
+                translation = "Canada";
+                break;
+            case "zh":
+                translation = "加拿大";
+                break;
+            case "es":
+                translation = "Canadá";
+                break;
+            default:
+                translation = null;
+                break;
         }
-        else if (language.equals("en")) {
-            return "Canada";
-        }
-        else if ("zh".equals(language)) {
-            return "加拿大";
-        }
-        else {
-            return null;
-        }
+
+        return translation;
     }
 }
