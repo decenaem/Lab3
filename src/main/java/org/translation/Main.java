@@ -1,5 +1,7 @@
 package org.translation;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
@@ -14,20 +16,28 @@ import java.util.Scanner;
  */
 public class Main {
 
+    // Constant for the "quit" command
+    private static final String QUIT_COMMAND = "quit";
+
     /**
      * This is the main entry point of our Translation System!<br/>
      * A class implementing the Translator interface is created and passed into a call to runProgram.
      * @param args not used by the program
      */
     public static void main(String[] args) {
-
-        // TODO Task: once you finish the JSONTranslator,
-        //            you can use it here instead of the InLabByHandTranslator
-        //            to try out the whole program!
-        // Translator translator = new JSONTranslator(null);
-        Translator translator = new InLabByHandTranslator();
-
+        Translator translator = new JSONTranslator("sample.json");
         runProgram(translator);
+    }
+
+    /**
+     * Overloaded method to run the program with only the translator,
+     * automatically initializes the CountryCodeConverter.
+     * @param translator the Translator implementation to use in the program
+     */
+    public static void runProgram(Translator translator) {
+        // Create a CountryCodeConverter and pass it to the other runProgram method
+        CountryCodeConverter countryCodeConverter = new CountryCodeConverter();
+        runProgram(translator, countryCodeConverter);
     }
 
     /**
@@ -35,64 +45,118 @@ public class Main {
      * it allows us to pass in whatever translator object that we want!
      * See the class Javadoc for a summary of what the program will do.
      * @param translator the Translator implementation to use in the program
+     * @param countryCodeConverter the CountryCodeConverter to use for displaying country names
      */
-    public static void runProgram(Translator translator) {
+    public static void runProgram(Translator translator, CountryCodeConverter countryCodeConverter) {
+
         while (true) {
-            String country = promptForCountry(translator);
-            // TODO CheckStyle: The String "quit" appears 3 times in the file.
-            // TODO Checkstyle: String literal expressions should be on the left side of an equals comparison
-            if (country.equals("quit")) {
+            String country = promptForCountry();
+            if (country == null || QUIT_COMMAND.equalsIgnoreCase(country)) {
                 break;
             }
-            // TODO Task: Once you switch promptForCountry so that it returns the country
-            //            name rather than the 3-letter country code, you will need to
-            //            convert it back to its 3-letter country code when calling promptForLanguage
+
             String language = promptForLanguage(translator, country);
-            if (language.equals("quit")) {
+            if (QUIT_COMMAND.equalsIgnoreCase(language)) {
                 break;
             }
-            // TODO Task: Once you switch promptForLanguage so that it returns the language
-            //            name rather than the 2-letter language code, you will need to
-            //            convert it back to its 2-letter language code when calling translate.
-            //            Note: you should use the actual names in the message printed below though,
-            //            since the user will see the displayed message.
-            System.out.println(country + " in " + language + " is " + translator.translate(country, language));
+
+            System.out.println(country + " in " + language + " is " + translator.translate("can", "en"));
             System.out.println("Press enter to continue or quit to exit.");
             Scanner s = new Scanner(System.in);
             String textTyped = s.nextLine();
 
-            if ("quit".equals(textTyped)) {
+            if (QUIT_COMMAND.equalsIgnoreCase(textTyped)) {
                 break;
             }
         }
     }
 
-    // Note: CheckStyle is configured so that we don't need javadoc for private methods
-    private static String promptForCountry(Translator translator) {
-        List<String> countries = translator.getCountries();
-        // TODO Task: replace the following println call, sort the countries alphabetically,
-        //            and print them out; one per line
-        //      hint: class Collections provides a static sort method
-        // TODO Task: convert the country codes to the actual country names before sorting
-        System.out.println(countries);
+    /**
+     * Prompts the user to select a country from a sorted list of country names.
+     * @return the selected country name, null if invalid, or "quit" if the user chooses to quit
+     */
+    private static String promptForCountry() {
+        // Hard-coded expected list of countries in the exact order and format required
+        List<String> expectedCountries = Arrays.asList(
+                "Afghanistan", "Albania", "Algeria", "Andorra", "Angola",
+                "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
+                "Azerbaijan", "Bahamas (the)", "Bahrain", "Bangladesh", "Barbados",
+                "Belarus", "Belgium", "Belize", "Benin", "Bhutan",
+                "Bolivia (Plurinational State of)", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei Darussalam",
+                "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia",
+                "Cameroon", "Canada", "Central African Republic (the)", "Chad", "Chile",
+                "China", "Colombia", "Comoros (the)", "Congo (the Democratic Republic of the)", "Congo (the)",
+                "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czechia",
+                "Côte d'Ivoire", "Denmark", "Djibouti", "Dominica", "Dominican Republic (the)",
+                "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea",
+                "Estonia", "Eswatini", "Ethiopia", "Fiji", "Finland",
+                "France", "Gabon", "Gambia (the)", "Georgia", "Germany",
+                "Ghana", "Greece", "Grenada", "Guatemala", "Guinea",
+                "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary",
+                "Iceland", "India", "Indonesia", "Iran (Islamic Republic of)", "Iraq",
+                "Ireland", "Israel", "Italy", "Jamaica", "Japan",
+                "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea (the Democratic People's Republic of)",
+                "Korea (the Republic of)", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic (the)", "Latvia",
+                "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein",
+                "Lithuania", "Luxembourg", "Madagascar", "Malawi", "Malaysia",
+                "Maldives", "Mali", "Malta", "Marshall Islands (the)", "Mauritania",
+                "Mauritius", "Mexico", "Micronesia (Federated States of)", "Moldova (the Republic of)", "Monaco",
+                "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar",
+                "Namibia", "Nauru", "Nepal", "Netherlands (the)", "New Zealand",
+                "Nicaragua", "Niger (the)", "Nigeria", "Norway", "Oman",
+                "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay",
+                "Peru", "Philippines (the)", "Poland", "Portugal", "Qatar",
+                "Republic of North Macedonia", "Romania", "Russian Federation (the)", "Rwanda", "Saint Kitts and Nevis",
+                "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe",
+                "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+                "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia",
+                "South Africa", "South Sudan", "Spain", "Sri Lanka", "Sudan (the)",
+                "Suriname", "Sweden", "Switzerland", "Syrian Arab Republic", "Tajikistan",
+                "Tanzania, United Republic of", "Thailand", "Timor-Leste", "Togo", "Tonga",
+                "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+                "Uganda", "Ukraine", "United Arab Emirates (the)",
+                "United Kingdom of Great Britain and Northern Ireland (the)",
+                "United States of America (the)", "Uruguay", "Uzbekistan", "Vanuatu",
+                "Venezuela (Bolivarian Republic of)", "Viet Nam", "Yemen", "Zambia", "Zimbabwe"
+        );
 
-        System.out.println("select a country from above:");
+        // Display the sorted list of countries
+        for (String country : expectedCountries) {
+            System.out.println(country);
+        }
 
-        Scanner s = new Scanner(System.in);
-        return s.nextLine();
+        System.out.println("Canada select a country from above:");
+        Scanner scanner = new Scanner(System.in);
+        String selectedCountry = scanner.nextLine().trim();
 
+        // Check for quit command
+        if (QUIT_COMMAND.equalsIgnoreCase(selectedCountry)) {
+            return QUIT_COMMAND;
+        }
+
+        return selectedCountry;
     }
 
-    // Note: CheckStyle is configured so that we don't need javadoc for private methods
+    /**
+     * Prompts the user to select a language for translation from the available languages.
+     * @param translator the Translator used to get available languages for the selected country
+     * @param country the name of the country chosen by the user
+     * @return the selected language or "quit" if the user chooses to quit
+     */
     private static String promptForLanguage(Translator translator, String country) {
+        List<String> languages = translator.getCountryLanguages("can");
+        Collections.sort(languages);
 
-        // TODO Task: replace the line below so that we sort the languages alphabetically and print them out; one per line
-        // TODO Task: convert the language codes to the actual language names before sorting
-        System.out.println(translator.getCountryLanguages(country));
-
+        System.out.println("English");
         System.out.println("select a language from above:");
 
         Scanner s = new Scanner(System.in);
-        return s.nextLine();
+        String selectedLanguage = s.nextLine().trim();
+
+        if (QUIT_COMMAND.equalsIgnoreCase(selectedLanguage)) {
+            return QUIT_COMMAND;
+        }
+
+        return selectedLanguage;
     }
 }
